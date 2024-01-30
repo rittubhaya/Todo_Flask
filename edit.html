@@ -1,0 +1,7 @@
+<!-- edit.html -->
+
+<form method="post" action="/update/{{ task_index }}">
+    <input type="text" name="updated_description" value="{{ task['description'] }}" required>
+    <button type="submit">Save</button>
+    <a href="/">[Cancel]</a>
+</form>

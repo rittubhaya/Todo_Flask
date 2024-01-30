@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To-Do List</title>
+</head>
+<body>
+    <h1>To-Do List</h1>
+
+    <form method="post" action="/add">
+        <label for="task_description">Add Task:</label>
+        <input type="text" id="task_description" name="task_description" required>
+        <button type="submit">Add</button>
+    </form>
+
+    <ul>
+        {% for task in tasks %}
+            <li>
+                {% if not task.get('editing', False) %}
+                    <input type="checkbox" {% if task['done'] %}checked{% endif %} onclick="updateTask({{ loop.index0 }})">
+                    {{ task['description'] }}
+                    <a href="/update/{{ loop.index0 }}">[Edit]</a>
+                    <a href="/delete/{{ loop.index0 }}">[Delete]</a>
+                {% else %}
+                    <form method="post" action="/update/{{ loop.index0 }}">
+                        <input type="text" name="updated_description" value="{{ task['description'] }}" required>
+                        <button type="submit">Save</button>
+                        <a href="/">[Cancel]</a>
+                    </form>
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+
+    <script>
+        function updateTask(task_index) {
+            fetch(`/update/${task_index}`, { method: 'GET' })  // Use GET method to fetch the edit form
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    return response.text();  // Fetch the HTML content of the edit form
+                })
+                .then(data => {
+                    document.getElementById('task_list').innerHTML = data;  // Replace the task list with the edit form
+                })
+                .catch(error => {
+                    console.error('Error fetching edit form:', error);
+                });
+        }
+    </script>
+</body>
+</html>
